@@ -1,0 +1,29 @@
+        public const string ContainerShell = "exec -i {0} bash";
+        public const string containerId = "<ID>";
+...
+        private void RunDockerShell(string containerId)
+        {
+            processDockerShell = new Process();
+            processDockerShell.StartInfo.FileName = "docker.exe";
+            processDockerShell.StartInfo.RedirectStandardInput = true;
+            processDockerShell.StartInfo.RedirectStandardError = true;
+            processDockerShell.StartInfo.RedirectStandardOutput = true;
+            processDockerShell.StartInfo.CreateNoWindow = true;
+            processDockerShell.StartInfo.UseShellExecute = false;
+            var CMDContainerShell = string.Format(CMD.ContainerShell, containerId);
+            processDockerShell.StartInfo.Arguments = CMDContainerShell;
+            processDockerShell.Start();
+            processDockerShell.BeginOutputReadLine();
+            processDockerShell.BeginErrorReadLine();
+            processDockerShell.OutputDataReceived += new DataReceivedEventHandler(ProcOutputHandler);
+            processDockerShell.ErrorDataReceived += new DataReceivedEventHandler(ProcOutputHandler);
+        }
+
+        private static void ProcOutputHandler(object sendingProcess,
+            DataReceivedEventArgs outLine)
+        {
+            if (!String.IsNullOrEmpty(outLine.Data))
+            {
+                Console.WriteLine("ProcOutputHandler => " + outLine.Data);
+            }
+        }
